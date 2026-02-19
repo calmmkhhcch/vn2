@@ -1,0 +1,997 @@
+﻿<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>越南油量計算系統 (正常顯示差異)</title>
+    <style>
+        /* 基本樣式與前版相同，僅調整正常狀態文字 */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        body {
+            background-color: #f0f0f0;
+            padding: 20px;
+        }
+        .disclaimer-container {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border-left: 4px solid #e74c3c;
+            max-width: 1200px;
+            margin: 0 auto 20px;
+        }
+        .disclaimer-title {
+            font-weight: bold;
+            margin-bottom: 12px;
+            color: #e74c3c;
+            font-size: 1.1em;
+        }
+        .disclaimer-content {
+            font-size: 0.9em;
+            color: #555;
+            line-height: 1.6;
+        }
+        .disclaimer-content p {
+            margin-bottom: 10px;
+            text-align: justify;
+        }
+        .disclaimer-content p:last-child {
+            margin-bottom: 0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        .main-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+        .required-fuel {
+            font-size: 16px;
+            font-weight: bold;
+            color: red;
+            background-color: #e6e6e6;
+            padding: 8px 15px;
+            border: 1px solid #999;
+            display: flex;
+            align-items: center;
+        }
+        .required-fuel input {
+            width: 120px;
+            margin-left: 10px;
+            padding: 5px;
+            border: 1px solid #999;
+        }
+        .refuel-section {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f5f5f5;
+            border-radius: 5px;
+            border-left: 4px solid #4CAF50;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .refuel-button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+            font-weight: bold;
+        }
+        .refuel-button:hover {
+            background-color: #45a049;
+        }
+        .lock-button {
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+            font-weight: bold;
+        }
+        .lock-button:hover {
+            background-color: #0b7dda;
+        }
+        .unlock-button {
+            background-color: #ff9800;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+            font-weight: bold;
+        }
+        .unlock-button:hover {
+            background-color: #e68a00;
+        }
+        .status-button {
+            background-color: #90EE90;
+            color: #333;
+            border: none;
+            padding: 12px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: default;
+        }
+        .estimated-time {
+            font-size: 16px;
+            color: #333;
+            flex-grow: 1;
+        }
+        .estimated-time span {
+            font-weight: bold;
+            color: #e74c3c;
+            display: block;
+            margin-top: 5px;
+            font-size: 18px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            border: 2px solid #000;
+        }
+        th, td {
+            border: 2px solid #000;
+            padding: 6px 4px;
+            text-align: center;
+            font-size: 13px;
+            height: 35px;
+        }
+        th {
+            background-color: #e6e6e6;
+            font-weight: bold;
+        }
+        .formula {
+            background-color: #f2f2f2;
+            color: #0070c0;
+            font-style: italic;
+            min-width: 60px;
+        }
+        .no-input {
+            background-color: #d9d9d9;
+            color: #7f7f7f;
+            padding: 2px 4px;
+            font-size: 11px;
+            height: 25px;
+            width: 50px;
+        }
+        .input-cell {
+            background-color: white;
+            padding: 2px 4px;
+            min-width: 70px;
+        }
+        input {
+            width: 100%;
+            border: 1px solid #999;
+            text-align: center;
+            background: white;
+            font-size: 13px;
+            padding: 3px;
+            border-radius: 3px;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+            height: 25px;
+        }
+        input:focus {
+            outline: 2px solid #4d90fe;
+            background-color: #f0f8ff;
+        }
+        input::placeholder {
+            color: #999;
+            font-style: italic;
+            font-size: 11px;
+        }
+        input:disabled {
+            background-color: #f5f5f5;
+            color: #999;
+            cursor: not-allowed;
+        }
+        .instructions {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-left: 4px solid #0070c0;
+        }
+        .instructions p {
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+        .formula-display {
+            font-style: italic;
+            color: #0070c0;
+            font-size: 12px;
+            padding: 2px 0;
+            min-width: 80px;
+        }
+        .red-text {
+            color: red;
+            font-weight: bold;
+        }
+        .note {
+            font-size: 11px;
+            color: #666;
+            margin-top: 3px;
+        }
+        .liter-input {
+            margin-top: 3px;
+        }
+        .discrepancy {
+            font-weight: bold;
+            color: black;
+        }
+        .separator {
+            border-bottom: 2px solid #000;
+            margin: 2px 0;
+        }
+        .input-label {
+            font-size: 10px;
+            color: #666;
+            margin-top: 1px;
+        }
+        .narrow-column {
+            width: 50px;
+        }
+        .remain-column {
+            width: 70px;
+        }
+        .red-english {
+            color: red;
+            font-weight: bold;
+        }
+        .info-cell {
+            padding: 0;
+            position: relative;
+            min-width: 120px;
+            background-color: transparent;
+        }
+        .info-cell-top {
+            background-color: #f9f9f9;
+            color: red;
+            font-weight: bold;
+            padding: 4px 2px;
+            border-bottom: 2px solid #000;
+            font-size: 12px;
+            height: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .info-cell-bottom {
+            padding: 4px 2px;
+            height: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #ffffff;
+        }
+        .info-cell-bottom input {
+            height: 20px;
+            font-size: 12px;
+        }
+        .info-cell-bottom .formula-display {
+            font-size: 12px;
+        }
+        .discrepancy-cell .info-cell-top,
+        .density-cell .info-cell-top,
+        .fuel-bill-cell .info-cell-top {
+            color: black;
+        }
+        .fuel-bill-cell .info-cell-bottom .note {
+            font-size: 11px;
+            color: #666;
+            text-align: center;
+        }
+        .long-text-cell .info-cell-top {
+            font-size: 10px;
+            line-height: 1.1;
+            padding: 2px 1px;
+            word-wrap: break-word;
+            background-color: #f9f9f9;
+        }
+        
+        /* 深藍綠背景與白色文字 */
+        .light-blue, .english-header {
+            background-color: rgb(4,108,132) !important;
+            color: white !important;
+        }
+        td.yellow {
+            background-color: rgb(4,108,132) !important;
+            color: white !important;
+        }
+        th.yellow {
+            background-color: rgb(219,163,20) !important;
+        }
+        th.liter-cell {
+            background-color: rgb(219,163,20) !important;
+        }
+        th.liter-cell input {
+            background-color: white;
+        }
+        td.density-cell {
+            background-color: rgb(219,163,20) !important;
+        }
+        td.density-cell .info-cell-top,
+        td.density-cell .info-cell-bottom {
+            background-color: inherit;
+        }
+        td.density-cell input {
+            background-color: white;
+        }
+        
+        .layout-note {
+            background-color: #fffacd;
+            border: 1px solid #e6db55;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        .layout-note p {
+            margin: 0;
+            color: #8b6914;
+            font-weight: bold;
+        }
+        .info-section {
+            background-color: #e6f2ff;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .info-section h3 {
+            margin-top: 0;
+            color: #0066cc;
+        }
+        .time-section {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+            max-width: 1200px;
+            margin: 20px auto 0;
+        }
+        .time-card {
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .time-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+        }
+        .card-title {
+            font-size: 1em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2c3e50;
+            text-align: center;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+            padding-bottom: 8px;
+        }
+        .time-display {
+            display: flex;
+            flex-direction: column;
+        }
+        .time-item {
+            margin: 5px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .time-label {
+            font-size: 0.8em;
+            color: #7f8c8d;
+            font-weight: bold;
+        }
+        .time-value {
+            font-size: 1em;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .card-1 { background: linear-gradient(135deg, #fff9c4, #ffecb3); border-left: 4px solid #ffd54f; }
+        .card-2 { background: linear-gradient(135deg, #c8e6c9, #a5d6a7); border-left: 4px solid #4caf50; }
+        .card-3 { background: linear-gradient(135deg, #fff9c4, #ffecb3); border-left: 4px solid #ffd54f; }
+        .card-4 { background: linear-gradient(135deg, #c8e6c9, #a5d6a7); border-left: 4px solid #4caf50; }
+        .card-5 { background: linear-gradient(135deg, #fff9c4, #ffecb3); border-left: 4px solid #ffd54f; }
+        .telegram-section {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+        .telegram-title {
+            font-size: 20px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #4CAF50;
+        }
+        .telegram-image {
+            display: block;
+            max-width: 100%;
+            height: auto;
+            margin: 0 auto;
+            border-radius: 5px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        .telegram-image.loaded {
+            opacity: 1;
+        }
+        .image-loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-style: italic;
+        }
+        .image-error {
+            text-align: center;
+            color: #e74c3c;
+            padding: 20px;
+            background-color: #ffe6e6;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        .result-row th {
+            background-color: #ffffff;
+            font-size: 15px;
+            padding: 10px;
+            text-align: left;
+            border-bottom: 2px solid #000;
+        }
+        /* 恢復前一版的綠色背景與文字顏色 */
+        .result-normal {
+            background-color: #a5d6a7 !important;
+            color: #1b5e20 !important;
+            font-weight: bold;
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+        .result-abnormal {
+            background-color: #ef9a9a !important;
+            color: #b71c1c;
+            font-weight: bold;
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+        .suggestion-text {
+            font-size: 13px;
+            margin-left: 15px;
+            color: #333;
+            font-weight: normal;
+        }
+        @media (max-width: 1024px) {
+            .time-section {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        @media (max-width: 768px) {
+            .time-section {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .refuel-section {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+        @media (max-width: 480px) {
+            .time-section {
+                grid-template-columns: 1fr;
+            }
+            .time-card {
+                min-height: 100px;
+                padding: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="disclaimer-container">
+        <div class="disclaimer-title">免責聲明：</div>
+        <div class="disclaimer-content">
+            <p>本網站為非營利性質，僅供內部交流與學習使用。</p>
+            <p>本網站所提供之資料與計算結果僅供參考，使用者應自行確認其正確性，本網站不對計算結果負責，敬請見諒。</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <div class="main-title">越南 油量計算 ( KG )</div>
+            <div class="required-fuel">
+                <span class="red-text">REQUIRED FUEL ( 總油量 )</span>
+                <input type="number" id="requiredFuelInput" placeholder="代表給的油量">
+            </div>
+        </div>
+
+        <div class="refuel-section">
+            <button id="startRefuelBtn" class="refuel-button">開始加油</button>
+            <button id="lockPageBtn" class="lock-button">鎖定網頁</button>
+            <button id="unlockPageBtn" class="unlock-button">解除鎖定</button>
+            <button id="statusButton" class="status-button">狀態：已解鎖，可輸入</button>
+            <div id="estimatedTime" class="estimated-time">
+                加油結束預估時間：
+                <span>尚未計算</span>
+            </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr class="result-row">
+                    <th colspan="9" id="resultCell">
+                        計算結果：<span id="resultStatus"></span>
+                        <span id="suggestionSpan" class="suggestion-text"></span>
+                    </th>
+                </tr>
+                <tr>
+                    <th colspan="2" class="light-blue">越南</th>
+                    <th class="light-blue remain-column">剩餘油量</th>
+                    <th class="light-blue">加油前</th>
+                    <th class="light-blue">加入油量</th>
+                    <th class="light-blue">總和</th>
+                    <th class="light-blue narrow-column">用不到</th>
+                    <th class="light-blue narrow-column">用不到</th>
+                    <th class="yellow">LITER (台塑給的油單資料)</th>
+                </tr>
+                <tr>
+                    <th colspan="2" class="english-header">TANK</th>
+                    <th class="english-header remain-column">REMAIN</th>
+                    <th class="english-header">B/F FUEL</th>
+                    <th class="english-header">UPLIFT</th>
+                    <th class="english-header">SUM</th>
+                    <th class="english-header narrow-column">ADJUST</th>
+                    <th class="english-header narrow-column">DEPART</th>
+                    <th class="english-header liter-cell"><input type="number" id="o10" placeholder="輸入LITER"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td colspan="2" class="yellow">LEFT</td>
+                    <td style="font-size: 11px;">已寫在TLB</td>
+                    <td class="input-cell"><input type="number" id="j11" placeholder="輸入數值"></td>
+                    <td class="formula" id="k11">0</td>
+                    <td class="input-cell"><input type="number" id="l11" placeholder="輸入數值"></td>
+                    <td class="no-input">不用寫</td>
+                    <td class="no-input">不用寫</td>
+                    <td class="info-cell">
+                        <div class="info-cell-top">BOWSER UPLIFT</div>
+                        <div class="info-cell-bottom">
+                            <div id="o12" class="formula-display">0</div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2" class="yellow">CTR</td>
+                    <td style="font-size: 11px;">已寫在TLB</td>
+                    <td class="input-cell"><input type="number" id="j13" placeholder="輸入數值"></td>
+                    <td class="formula" id="k13">0</td>
+                    <td class="input-cell"><input type="number" id="l13" placeholder="輸入數值"></td>
+                    <td class="no-input">不用寫</td>
+                    <td class="no-input">不用寫</td>
+                    <td class="info-cell long-text-cell">
+                        <div class="info-cell-top">TOTAL UPLIFT （總加油量）</div>
+                        <div class="info-cell-bottom">
+                            <div id="o14" class="formula-display">0</div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2" class="yellow">RIGHT</td>
+                    <td style="font-size: 11px;">已寫在TLB</td>
+                    <td class="input-cell"><input type="number" id="j15" placeholder="輸入數值"></td>
+                    <td class="formula" id="k15">0</td>
+                    <td class="input-cell"><input type="number" id="l15" placeholder="輸入數值"></td>
+                    <td class="no-input">不用寫</td>
+                    <td class="no-input">不用寫</td>
+                    <td class="info-cell discrepancy-cell">
+                        <div class="info-cell-top">DISCREPANCY 差異</div>
+                        <div class="info-cell-bottom">
+                            <div id="o16" class="formula-display">0</div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2" class="yellow">TRIM</td>
+                    <td class="no-input">不用寫</td>
+                    <td class="no-input">不用寫</td>
+                    <td class="no-input">不用寫</td>
+                    <td class="no-input">不用寫</td>
+                    <td class="no-input">不用寫</td>
+                    <td class="no-input">不用寫</td>
+                    <td class="info-cell density-cell long-text-cell">
+                        <div class="info-cell-top">DENSITY （密度自己輸入）</div>
+                        <div class="info-cell-bottom">
+                            <input type="number" id="o18" placeholder="輸入密度" step="0.01">
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2" class="yellow">TOTAL</td>
+                    <td class="formula" id="i19">0</td>
+                    <td class="formula" id="j19">0</td>
+                    <td class="formula" id="k19">0</td>
+                    <td class="formula" id="l19">0</td>
+                    <td class="no-input">不用寫</td>
+                    <td class="no-input">不用寫</td>
+                    <td class="info-cell fuel-bill-cell">
+                        <div class="info-cell-top">FUEL BILL NO</div>
+                        <div class="info-cell-bottom">
+                            <div class="note">看油單填寫油車號碼</div>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="instructions">
+            <p><strong>操作說明：</strong></p>
+            <p>1. 運務會先給初步油量,如果沒有先設定9300kg先加油,等教官來會給FINAL油量( <span class="red-text">REQUIRED FUEL</span> )</p>
+            <p>2. 油單背面寫 <span class="red-text">REQUIRED FUEL / TOTAL UPLIFT/ BOWSER UPLIFT</span>,上空橋給代表 (他可能走到登機櫃台)</p>
+            <p>3. 貼紙那張授權班長簽完名就可以一起拿給代表 (如果越南沒貼紙就暫時不用)</p>
+            <p><strong>注意：</strong>油車的資料要輸入，不然無法運算</p>
+            <div class="layout-note">
+                <p>* 表格照越南TLB製作，橫式 篇幅可能比較大，建議要手動縮小版面</p>
+            </div>
+        </div>
+        
+        <div class="info-section">
+            <h3>加油時間計算說明</h3>
+            <p>此計算器根據加油作業標準估算加油時間：</p>
+            <ul>
+                <li>計算公式：(REQUIRED FUEL - 剩餘油量總和) / 720 分鐘</li>
+                <li>加油速率：720磅/分鐘</li>
+                <li>計算結果為預估時間，實際加油時間可能因設備狀況、油料流速等因素有所不同</li>
+                <li>計算結果基於當前台灣時間</li>
+            </ul>
+        </div>
+        
+        <div class="time-section">
+            <div class="time-card card-1">
+                <div class="card-title">當前時間</div>
+                <div class="time-display">
+                    <div class="time-item"><span class="time-label">台灣時間</span><span class="time-value" id="taiwan-time">--:--:--</span></div>
+                    <div class="time-item"><span class="time-label">星期</span><span class="time-value" id="taiwan-day">--</span></div>
+                    <div class="time-item"><span class="time-label">虎航 UTC</span><span class="time-value" id="tigerair-utc">--</span></div>
+                    <div class="time-item"><span class="time-label">越南 UTC</span><span class="time-value" id="vietnam-utc">--</span></div>
+                </div>
+            </div>
+            <div class="time-card card-2">
+                <div class="card-title">CAT B</div>
+                <div class="time-display"><div class="time-item"><span class="time-label">3天後</span><span class="time-value" id="plus3-b">--</span></div></div>
+            </div>
+            <div class="time-card card-3">
+                <div class="card-title">CAT C</div>
+                <div class="time-display"><div class="time-item"><span class="time-label">10天後</span><span class="time-value" id="plus10-c">--</span></div></div>
+            </div>
+            <div class="time-card card-4">
+                <div class="card-title">CAT D</div>
+                <div class="time-display"><div class="time-item"><span class="time-label">120天後</span><span class="time-value" id="plus120-d">--</span></div></div>
+            </div>
+            <div class="time-card card-5">
+                <div class="card-title">180天後</div>
+                <div class="time-display"><div class="time-item"><span class="time-label">日期</span><span class="time-value" id="plus180">--</span></div></div>
+            </div>
+        </div>
+        
+        <div class="telegram-section">
+            <div class="telegram-title">送機後回辦公室打越南電報</div>
+            <div id="image-loading" class="image-loading">圖片加載中，請稍候...</div>
+            <img src="https://i.ibb.co/JjQcS0dV/7bf00289-e9db-4df0-a69e-92f430c9d4f6-1.png" 
+                 alt="越南電報圖片" 
+                 class="telegram-image" 
+                 id="telegram-image"
+                 onload="imageLoaded()">
+            <div id="image-error" class="image-error" style="display: none;">圖片加載失敗，請檢查網路連線或圖片URL是否正確。</div>
+        </div>
+    </div>
+
+    <script>
+        let isPageLocked = false;
+        
+        function updateTime() {
+            const now = new Date();
+            const taiwanTime = now.toLocaleString('zh-TW', { timeZone: 'Asia/Taipei', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+            const taiwanDay = now.toLocaleString('zh-TW', { timeZone: 'Asia/Taipei', weekday: 'long' });
+            const tigerairDate = new Date(now.toUTCString());
+            const day = tigerairDate.getUTCDate();
+            const monthNames = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+            const month = monthNames[tigerairDate.getUTCMonth()];
+            const year = tigerairDate.getUTCFullYear().toString().slice(-2);
+            const hours = tigerairDate.getUTCHours().toString().padStart(2, '0');
+            const minutes = tigerairDate.getUTCMinutes().toString().padStart(2, '0');
+            const tigerairUTC = `${day}/${month}/${year} ${hours}:${minutes}`;
+            const vietnamDate = new Date(now.toUTCString());
+            const vnDay = vietnamDate.getUTCDate().toString().padStart(2, '0');
+            const vnMonth = (vietnamDate.getUTCMonth() + 1).toString().padStart(2, '0');
+            const vnYear = vietnamDate.getUTCFullYear().toString().slice(-2);
+            const vnHours = vietnamDate.getUTCHours().toString().padStart(2, '0');
+            const vnMinutes = vietnamDate.getUTCMinutes().toString().padStart(2, '0');
+            const vietnamUTC = `${vnDay}/${vnMonth}/${vnYear} ${vnHours}:${vnMinutes}`;
+            document.getElementById('taiwan-time').textContent = taiwanTime;
+            document.getElementById('taiwan-day').textContent = taiwanDay;
+            document.getElementById('tigerair-utc').textContent = tigerairUTC;
+            document.getElementById('vietnam-utc').textContent = vietnamUTC;
+            function formatDate(date) {
+                return date.toLocaleDateString('zh-TW', { year: 'numeric', month: '2-digit', day: '2-digit' });
+            }
+            const plus3 = new Date(now); plus3.setDate(now.getDate() + 3); document.getElementById('plus3-b').textContent = formatDate(plus3);
+            const plus10 = new Date(now); plus10.setDate(now.getDate() + 10); document.getElementById('plus10-c').textContent = formatDate(plus10);
+            const plus120 = new Date(now); plus120.setDate(now.getDate() + 120); document.getElementById('plus120-d').textContent = formatDate(plus120);
+            const plus180 = new Date(now); plus180.setDate(now.getDate() + 180); document.getElementById('plus180').textContent = formatDate(plus180);
+        }
+        
+        const inputs = document.querySelectorAll('input');
+        inputs.forEach(input => {
+            input.addEventListener('input', calculateAll);
+        });
+        
+        document.getElementById('startRefuelBtn').addEventListener('click', calculateRefuelTime);
+        document.getElementById('lockPageBtn').addEventListener('click', lockPage);
+        document.getElementById('unlockPageBtn').addEventListener('click', unlockPage);
+        
+        calculateAll();
+        
+        // 檢查必要欄位是否已填寫（排除 CTR 的 j13 和 l13）
+        function allMainInputsFilled() {
+            const requiredIds = ['j11', 'l11', 'j15', 'l15', 'o10', 'o18'];
+            for (let id of requiredIds) {
+                const el = document.getElementById(id);
+                if (!el || el.value.trim() === '') {
+                    return false;
+                }
+            }
+            return true;
+        }
+        
+        function calculateAll() {
+            const j11 = parseFloat(document.getElementById('j11').value) || 0;
+            const l11 = parseFloat(document.getElementById('l11').value) || 0;
+            const j13 = parseFloat(document.getElementById('j13').value) || 0;
+            const l13 = parseFloat(document.getElementById('l13').value) || 0;
+            const j15 = parseFloat(document.getElementById('j15').value) || 0;
+            const l15 = parseFloat(document.getElementById('l15').value) || 0;
+            const o10 = parseFloat(document.getElementById('o10').value) || 0;
+            const o18 = parseFloat(document.getElementById('o18').value) || 0;
+            
+            const k11 = l11 - j11;
+            const k13 = l13 - j13;
+            const k15 = l15 - j15;
+            
+            const i19 = 0; 
+            const j19 = j11 + j13 + j15;
+            const k19 = k11 + k13 + k15;
+            const l19 = l11 + l13 + l15;
+            
+            const o12 = Math.round(o18 * o10 * 100) / 100;
+            const o16 = Math.round((o12 - k19) * 100) / 100;
+            
+            document.getElementById('k11').textContent = k11.toFixed(2);
+            document.getElementById('k13').textContent = k13.toFixed(2);
+            document.getElementById('k15').textContent = k15.toFixed(2);
+            
+            document.getElementById('i19').textContent = Math.round(i19);
+            document.getElementById('j19').textContent = Math.round(j19);
+            document.getElementById('k19').textContent = Math.round(k19);
+            document.getElementById('l19').textContent = Math.round(l19);
+            
+            document.getElementById('o12').textContent = o12.toFixed(2);
+            document.getElementById('o14').textContent = Math.round(k19);
+            document.getElementById('o16').textContent = o16.toFixed(2);
+            
+            // 只有當必要欄位（不含 CTR）都已填寫時，才顯示計算結果
+            if (allMainInputsFilled()) {
+                updateResultDisplay(o16, Math.round(j19), Math.round(l19), o12);
+            } else {
+                document.getElementById('resultStatus').textContent = '';
+                document.getElementById('suggestionSpan').textContent = '';
+            }
+        }
+        
+        function updateResultDisplay(discrepancy, currentJ19, l19, o12) {
+            const resultSpan = document.getElementById('resultStatus');
+            const suggestionSpan = document.getElementById('suggestionSpan');
+            
+            resultSpan.classList.remove('result-normal', 'result-abnormal');
+            
+            if (discrepancy >= -100 && discrepancy <= 100) {
+                // 正常狀態：顯示差異值及符合範圍
+                resultSpan.textContent = `正常 (差異值: ${discrepancy.toFixed(2)}，符合 -100~100 之間)`;
+                resultSpan.classList.add('result-normal');
+                suggestionSpan.textContent = '';
+            } else {
+                resultSpan.textContent = `異常 (差異值: ${discrepancy.toFixed(2)}，已超出 -100~100 範圍)`;
+                resultSpan.classList.add('result-abnormal');
+                
+                let idealJ19 = Math.round(l19 - o12);
+                let direction = discrepancy < -100 ? '以上' : '以下';
+                suggestionSpan.textContent = `建議調整剩餘油量至 ${idealJ19} ${direction}`;
+            }
+        }
+        
+        function calculateRefuelTime() {
+            const requiredFuel = parseFloat(document.getElementById('requiredFuelInput').value) || 0;
+            const remainingFuel = parseInt(document.getElementById('j19').textContent) || 0;
+            
+            if (requiredFuel <= remainingFuel) {
+                document.getElementById('estimatedTime').innerHTML = '加油結束預估時間：<span>油量已足夠，無需加油</span>';
+                return;
+            }
+            
+            if (requiredFuel <= 0) {
+                document.getElementById('estimatedTime').innerHTML = '加油結束預估時間：<span>請輸入正確的油量數據</span>';
+                return;
+            }
+            
+            const refuelTimeMinutes = (requiredFuel - remainingFuel) / 720;
+            const now = new Date();
+            const completionTime = new Date(now.getTime() + (refuelTimeMinutes * 60 * 1000));
+            const formattedTime = formatDateTime(completionTime);
+            const durationHours = Math.floor(refuelTimeMinutes / 60);
+            const durationMinutes = Math.round(refuelTimeMinutes % 60);
+            let durationText = durationHours > 0 ? `（約需 ${durationHours} 小時 ${durationMinutes} 分鐘）` : `（約需 ${durationMinutes} 分鐘）`;
+            
+            document.getElementById('estimatedTime').innerHTML = `加油結束預估時間：<span>${formattedTime} ${durationText}</span>`;
+        }
+        
+        function formatDateTime(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            const seconds = String(date.getSeconds()).padStart(2, '0');
+            return `${year}/${month}/${day} ${hours}:${minutes}:${seconds}`;
+        }
+        
+        function updateStatusButton() {
+            const statusButton = document.getElementById('statusButton');
+            if (isPageLocked) {
+                statusButton.textContent = "狀態：已鎖定，請解鎖";
+                statusButton.style.backgroundColor = "#ffcccc";
+            } else {
+                statusButton.textContent = "狀態：已解鎖，可輸入";
+                statusButton.style.backgroundColor = "#90EE90";
+            }
+        }
+        
+        function lockPage() {
+            isPageLocked = true;
+            const inputs = document.querySelectorAll('input');
+            inputs.forEach(input => { input.disabled = true; });
+            
+            const inputValues = {};
+            inputs.forEach(input => { inputValues[input.id] = input.value; });
+            inputValues['k11'] = document.getElementById('k11').textContent;
+            inputValues['k13'] = document.getElementById('k13').textContent;
+            inputValues['k15'] = document.getElementById('k15').textContent;
+            inputValues['i19'] = document.getElementById('i19').textContent;
+            inputValues['j19'] = document.getElementById('j19').textContent;
+            inputValues['k19'] = document.getElementById('k19').textContent;
+            inputValues['l19'] = document.getElementById('l19').textContent;
+            inputValues['o12'] = document.getElementById('o12').textContent;
+            inputValues['o14'] = document.getElementById('o14').textContent;
+            inputValues['o16'] = document.getElementById('o16').textContent;
+            
+            localStorage.setItem('fuelCalculatorData', JSON.stringify(inputValues));
+            localStorage.setItem('isPageLocked', 'true');
+            updateStatusButton();
+            alert('網頁已鎖定，所有輸入框已禁用，重新整理頁面不會丟失資料。');
+        }
+        
+        function unlockPage() {
+            isPageLocked = false;
+            const inputs = document.querySelectorAll('input');
+            inputs.forEach(input => { input.disabled = false; });
+            localStorage.removeItem('fuelCalculatorData');
+            localStorage.removeItem('isPageLocked');
+            updateStatusButton();
+            alert('網頁已解除鎖定，可以重新整理頁面了。');
+        }
+        
+        function imageLoaded() {
+            document.getElementById('telegram-image').classList.add('loaded');
+            document.getElementById('image-loading').style.display = 'none';
+        }
+        
+        window.addEventListener('load', function() {
+            const savedData = localStorage.getItem('fuelCalculatorData');
+            const isLocked = localStorage.getItem('isPageLocked');
+            
+            if (savedData && isLocked === 'true') {
+                const inputValues = JSON.parse(savedData);
+                Object.keys(inputValues).forEach(key => {
+                    const element = document.getElementById(key);
+                    if (element && element.tagName === 'INPUT') {
+                        element.value = inputValues[key];
+                    }
+                });
+                document.getElementById('k11').textContent = inputValues['k11'] || '0';
+                document.getElementById('k13').textContent = inputValues['k13'] || '0';
+                document.getElementById('k15').textContent = inputValues['k15'] || '0';
+                document.getElementById('i19').textContent = inputValues['i19'] || '0';
+                document.getElementById('j19').textContent = inputValues['j19'] || '0';
+                document.getElementById('k19').textContent = inputValues['k19'] || '0';
+                document.getElementById('l19').textContent = inputValues['l19'] || '0';
+                document.getElementById('o12').textContent = inputValues['o12'] || '0';
+                document.getElementById('o14').textContent = inputValues['o14'] || '0';
+                document.getElementById('o16').textContent = inputValues['o16'] || '0';
+                alert('已恢復上次鎖定的資料。');
+            }
+            
+            const telegramImage = document.getElementById('telegram-image');
+            telegramImage.onerror = function() {
+                document.getElementById('image-error').style.display = 'block';
+                document.getElementById('image-loading').style.display = 'none';
+                telegramImage.style.display = 'none';
+            };
+            
+            if (!allMainInputsFilled()) {
+                document.getElementById('resultStatus').textContent = '';
+                document.getElementById('suggestionSpan').textContent = '';
+            }
+        });
+        
+        window.addEventListener('beforeunload', function(e) {
+            if (isPageLocked) {
+                e.preventDefault();
+                e.returnValue = '您有未保存的更改，確定要離開嗎？';
+            }
+        });
+        
+        updateTime();
+        setInterval(updateTime, 1000);
+    </script>
+</body>
+</html>

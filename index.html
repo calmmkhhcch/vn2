@@ -1,11 +1,11 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>越南油量計算系統 (正常顯示差異)</title>
+    <title>越南油量計算系統 (按鈕平行)</title>
     <style>
-        /* 基本樣式與前版相同，僅調整正常狀態文字 */
+        /* 基本樣式 */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -80,6 +80,8 @@
             padding: 5px;
             border: 1px solid #999;
         }
+        
+        /* 按鈕區域：預設允許換行，但大螢幕強制不換行 */
         .refuel-section {
             display: flex;
             align-items: center;
@@ -89,21 +91,36 @@
             border-radius: 5px;
             border-left: 4px solid #4CAF50;
             gap: 15px;
-            flex-wrap: wrap;
+            flex-wrap: wrap; /* 小螢幕可換行 */
+        }
+        /* 大螢幕（寬度 > 768px）時強制不換行 */
+        @media (min-width: 769px) {
+            .refuel-section {
+                flex-wrap: nowrap;
+            }
+        }
+        /* 小螢幕（≤768px）時改為垂直排列（原樣式） */
+        @media (max-width: 768px) {
+            .refuel-section {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+        
+        /* 按鈕通用樣式：確保文字不換行，適當內邊距 */
+        .refuel-button, .lock-button, .unlock-button, .status-button {
+            white-space: nowrap;
+            padding: 10px 15px; /* 稍微縮小內邊距以節省空間 */
+            font-size: 15px;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
         }
         .refuel-button {
             background-color: #4CAF50;
             color: white;
-            border: none;
-            padding: 12px 20px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 16px;
-            cursor: pointer;
-            border-radius: 4px;
-            transition: background-color 0.3s;
-            font-weight: bold;
         }
         .refuel-button:hover {
             background-color: #45a049;
@@ -111,16 +128,6 @@
         .lock-button {
             background-color: #2196F3;
             color: white;
-            border: none;
-            padding: 12px 20px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 16px;
-            cursor: pointer;
-            border-radius: 4px;
-            transition: background-color 0.3s;
-            font-weight: bold;
         }
         .lock-button:hover {
             background-color: #0b7dda;
@@ -128,16 +135,6 @@
         .unlock-button {
             background-color: #ff9800;
             color: white;
-            border: none;
-            padding: 12px 20px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 16px;
-            cursor: pointer;
-            border-radius: 4px;
-            transition: background-color 0.3s;
-            font-weight: bold;
         }
         .unlock-button:hover {
             background-color: #e68a00;
@@ -145,20 +142,14 @@
         .status-button {
             background-color: #90EE90;
             color: #333;
-            border: none;
-            padding: 12px 20px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 16px;
-            border-radius: 4px;
-            font-weight: bold;
             cursor: default;
         }
         .estimated-time {
             font-size: 16px;
             color: #333;
-            flex-grow: 1;
+            flex-grow: 1; /* 佔滿剩餘空間 */
+            min-width: 200px; /* 避免被壓縮得太小 */
+            white-space: normal; /* 允許內部換行 */
         }
         .estimated-time span {
             font-weight: bold;
@@ -167,6 +158,7 @@
             margin-top: 5px;
             font-size: 18px;
         }
+        
         table {
             width: 100%;
             border-collapse: collapse;
@@ -492,7 +484,6 @@
             text-align: left;
             border-bottom: 2px solid #000;
         }
-        /* 恢復前一版的綠色背景與文字顏色 */
         .result-normal {
             background-color: #a5d6a7 !important;
             color: #1b5e20 !important;
@@ -518,24 +509,7 @@
                 grid-template-columns: repeat(3, 1fr);
             }
         }
-        @media (max-width: 768px) {
-            .time-section {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            .refuel-section {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-        }
-        @media (max-width: 480px) {
-            .time-section {
-                grid-template-columns: 1fr;
-            }
-            .time-card {
-                min-height: 100px;
-                padding: 12px;
-            }
-        }
+        /* 小螢幕時，按鈕已改為垂直排列（見上方 media） */
     </style>
 </head>
 <body>
@@ -556,6 +530,7 @@
             </div>
         </div>
 
+        <!-- 按鈕區域：已調整為在大螢幕平行顯示 -->
         <div class="refuel-section">
             <button id="startRefuelBtn" class="refuel-button">開始加油</button>
             <button id="lockPageBtn" class="lock-button">鎖定網頁</button>

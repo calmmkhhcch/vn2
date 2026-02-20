@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>越南油量計算系統 (按鈕平行)</title>
+    <title>越南油量計算系統 (建議換行高亮)</title>
     <style>
         /* 基本樣式 */
         * {
@@ -81,7 +81,7 @@
             border: 1px solid #999;
         }
         
-        /* 按鈕區域：預設允許換行，但大螢幕強制不換行 */
+        /* 按鈕區域：大螢幕平行，小螢幕垂直 */
         .refuel-section {
             display: flex;
             align-items: center;
@@ -91,15 +91,13 @@
             border-radius: 5px;
             border-left: 4px solid #4CAF50;
             gap: 15px;
-            flex-wrap: wrap; /* 小螢幕可換行 */
+            flex-wrap: wrap;
         }
-        /* 大螢幕（寬度 > 768px）時強制不換行 */
         @media (min-width: 769px) {
             .refuel-section {
                 flex-wrap: nowrap;
             }
         }
-        /* 小螢幕（≤768px）時改為垂直排列（原樣式） */
         @media (max-width: 768px) {
             .refuel-section {
                 flex-direction: column;
@@ -107,10 +105,9 @@
             }
         }
         
-        /* 按鈕通用樣式：確保文字不換行，適當內邊距 */
         .refuel-button, .lock-button, .unlock-button, .status-button {
             white-space: nowrap;
-            padding: 10px 15px; /* 稍微縮小內邊距以節省空間 */
+            padding: 10px 15px;
             font-size: 15px;
             border: none;
             border-radius: 4px;
@@ -147,9 +144,9 @@
         .estimated-time {
             font-size: 16px;
             color: #333;
-            flex-grow: 1; /* 佔滿剩餘空間 */
-            min-width: 200px; /* 避免被壓縮得太小 */
-            white-space: normal; /* 允許內部換行 */
+            flex-grow: 1;
+            min-width: 200px;
+            white-space: normal;
         }
         .estimated-time span {
             font-weight: bold;
@@ -499,8 +496,15 @@
             border-radius: 4px;
         }
         .suggestion-text {
-            font-size: 13px;
-            margin-left: 15px;
+            display: block;          /* 強制換行 */
+            margin-top: 8px;
+            font-size: 14px;
+            margin-left: 0;           /* 移除原有左邊距 */
+        }
+        .suggestion-highlight {
+            background-color: #fffacd; /* 亮黃色，與 layout-note 一致 */
+            padding: 5px 10px;
+            border-radius: 4px;
             color: #333;
             font-weight: normal;
         }
@@ -509,7 +513,6 @@
                 grid-template-columns: repeat(3, 1fr);
             }
         }
-        /* 小螢幕時，按鈕已改為垂直排列（見上方 media） */
     </style>
 </head>
 <body>
@@ -530,7 +533,6 @@
             </div>
         </div>
 
-        <!-- 按鈕區域：已調整為在大螢幕平行顯示 -->
         <div class="refuel-section">
             <button id="startRefuelBtn" class="refuel-button">開始加油</button>
             <button id="lockPageBtn" class="lock-button">鎖定網頁</button>
@@ -811,6 +813,7 @@
             } else {
                 document.getElementById('resultStatus').textContent = '';
                 document.getElementById('suggestionSpan').textContent = '';
+                document.getElementById('suggestionSpan').classList.remove('suggestion-highlight');
             }
         }
         
@@ -821,10 +824,10 @@
             resultSpan.classList.remove('result-normal', 'result-abnormal');
             
             if (discrepancy >= -100 && discrepancy <= 100) {
-                // 正常狀態：顯示差異值及符合範圍
                 resultSpan.textContent = `正常 (差異值: ${discrepancy.toFixed(2)}，符合 -100~100 之間)`;
                 resultSpan.classList.add('result-normal');
                 suggestionSpan.textContent = '';
+                suggestionSpan.classList.remove('suggestion-highlight');
             } else {
                 resultSpan.textContent = `異常 (差異值: ${discrepancy.toFixed(2)}，已超出 -100~100 範圍)`;
                 resultSpan.classList.add('result-abnormal');
@@ -832,6 +835,7 @@
                 let idealJ19 = Math.round(l19 - o12);
                 let direction = discrepancy < -100 ? '以上' : '以下';
                 suggestionSpan.textContent = `建議調整剩餘油量至 ${idealJ19} ${direction}`;
+                suggestionSpan.classList.add('suggestion-highlight');
             }
         }
         
@@ -955,6 +959,7 @@
             if (!allMainInputsFilled()) {
                 document.getElementById('resultStatus').textContent = '';
                 document.getElementById('suggestionSpan').textContent = '';
+                document.getElementById('suggestionSpan').classList.remove('suggestion-highlight');
             }
         });
         

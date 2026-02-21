@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>越南油量計算系統 (時間區域擴充)</title>
+    <title>越南油量計算系統 (卡片間距加大)</title>
     <style>
         /* 基本樣式 */
         * {
@@ -375,7 +375,7 @@
             color: #0066cc;
         }
         
-        /* 時間卡片區域：改為6欄，小螢幕自動換行 */
+        /* 時間卡片區域：6欄，小螢幕自動換行 */
         .time-section {
             display: grid;
             grid-template-columns: repeat(6, 1fr);
@@ -399,6 +399,10 @@
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
         }
         .card-title {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1.5em;  /* 約兩個中文字寬度 */
             font-size: 1em;
             font-weight: bold;
             margin-bottom: 10px;
@@ -406,6 +410,10 @@
             text-align: center;
             border-bottom: 1px solid rgba(0,0,0,0.1);
             padding-bottom: 8px;
+        }
+        .days-highlight {
+            color: red;
+            font-weight: bold;
         }
         .time-display {
             display: flex;
@@ -427,13 +435,25 @@
             font-weight: bold;
             color: #2c3e50;
         }
-        /* 卡片顏色，新增的越南NEF使用類似card-1的顏色 */
+        /* 越南 UTC 標籤紅字 */
+        .vietnam-label {
+            color: red;
+            font-weight: bold;
+        }
+        /* 越南 UTC 整行放大 */
+        .vietnam-row {
+            font-size: 1.5em;
+            line-height: 1.4;
+            margin: 8px 0;
+        }
+        
+        /* 卡片顏色 */
         .card-1 { background: linear-gradient(135deg, #fff9c4, #ffecb3); border-left: 4px solid #ffd54f; }
         .card-2 { background: linear-gradient(135deg, #c8e6c9, #a5d6a7); border-left: 4px solid #4caf50; }
         .card-3 { background: linear-gradient(135deg, #fff9c4, #ffecb3); border-left: 4px solid #ffd54f; }
         .card-4 { background: linear-gradient(135deg, #c8e6c9, #a5d6a7); border-left: 4px solid #4caf50; }
         .card-5 { background: linear-gradient(135deg, #fff9c4, #ffecb3); border-left: 4px solid #ffd54f; }
-        .card-6 { background: linear-gradient(135deg, #c8e6c9, #a5d6a7); border-left: 4px solid #4caf50; } /* 新增卡片使用綠色系 */
+        .card-6 { background: linear-gradient(135deg, #c8e6c9, #a5d6a7); border-left: 4px solid #4caf50; }
         
         /* 月份對照表區域 */
         .month-section {
@@ -725,40 +745,65 @@
             </ul>
         </div>
         
-        <!-- 時間卡片區域：現在有6張卡片 -->
+        <!-- 時間卡片區域 -->
         <div class="time-section">
             <div class="time-card card-1">
                 <div class="card-title">當前時間</div>
                 <div class="time-display">
                     <div class="time-item"><span class="time-label">台灣時間</span><span class="time-value" id="taiwan-time">--:--:--</span></div>
                     <div class="time-item"><span class="time-label">星期</span><span class="time-value" id="taiwan-day">--</span></div>
-                    <div class="time-item"><span class="time-label">虎航 UTC</span><span class="time-value" id="tigerair-utc">--</span></div>
-                    <div class="time-item"><span class="time-label">越南 UTC</span><span class="time-value" id="vietnam-utc">--</span></div>
+                    <!-- 越南 UTC 放大 -->
+                    <div class="time-item vietnam-row">
+                        <span class="time-label vietnam-label">越南 UTC</span>
+                        <span class="time-value" id="vietnam-utc">--</span>
+                    </div>
                 </div>
             </div>
             <div class="time-card card-2">
-                <div class="card-title">CAT B</div>
-                <div class="time-display"><div class="time-item"><span class="time-label">3天後</span><span class="time-value" id="plus3-b">--</span></div></div>
+                <div class="card-title">
+                    <span>CAT B</span>
+                    <span class="days-highlight">3天後</span>
+                </div>
+                <div class="time-display">
+                    <div class="time-item"><span class="time-label">日期</span><span class="time-value" id="plus3-b">--</span></div>
+                </div>
             </div>
             <div class="time-card card-3">
-                <div class="card-title">CAT C</div>
-                <div class="time-display"><div class="time-item"><span class="time-label">10天後</span><span class="time-value" id="plus10-c">--</span></div></div>
+                <div class="card-title">
+                    <span>CAT C</span>
+                    <span class="days-highlight">10天後</span>
+                </div>
+                <div class="time-display">
+                    <div class="time-item"><span class="time-label">日期</span><span class="time-value" id="plus10-c">--</span></div>
+                </div>
             </div>
             <div class="time-card card-4">
-                <div class="card-title">CAT D</div>
-                <div class="time-display"><div class="time-item"><span class="time-label">120天後</span><span class="time-value" id="plus120-d">--</span></div></div>
+                <div class="card-title">
+                    <span>CAT D</span>
+                    <span class="days-highlight">120天後</span>
+                </div>
+                <div class="time-display">
+                    <div class="time-item"><span class="time-label">日期</span><span class="time-value" id="plus120-d">--</span></div>
+                </div>
             </div>
             <div class="time-card card-5">
                 <div class="card-title">180天後</div>
-                <div class="time-display"><div class="time-item"><span class="time-label">日期</span><span class="time-value" id="plus180">--</span></div></div>
+                <div class="time-display">
+                    <div class="time-item"><span class="time-label">日期</span><span class="time-value" id="plus180">--</span></div>
+                </div>
             </div>
             <div class="time-card card-6">
-                <div class="card-title">越南NEF 9個月後</div>
-                <div class="time-display"><div class="time-item"><span class="time-label">日期</span><span class="time-value" id="plus9months">--</span></div></div>
+                <div class="card-title">
+                    <span>越南NEF</span>
+                    <span class="days-highlight">9個月後</span>
+                </div>
+                <div class="time-display">
+                    <div class="time-item"><span class="time-label">日期</span><span class="time-value" id="plus9months">--</span></div>
+                </div>
             </div>
         </div>
         
-        <!-- 新增的12個月英文縮寫對照表 -->
+        <!-- 12個月英文縮寫對照表 -->
         <div class="month-section">
             <div class="month-item"><span>1月</span><span class="en">JAN</span></div>
             <div class="month-item"><span>2月</span><span class="en">FEB</span></div>
@@ -796,17 +841,7 @@
             const taiwanTime = now.toLocaleString('zh-TW', { timeZone: 'Asia/Taipei', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
             const taiwanDay = now.toLocaleString('zh-TW', { timeZone: 'Asia/Taipei', weekday: 'long' });
             
-            // 虎航 UTC (日/月英文/年 時:分)
-            const tigerairDate = new Date(now.toUTCString());
-            const day = tigerairDate.getUTCDate();
-            const monthNames = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
-            const month = monthNames[tigerairDate.getUTCMonth()];
-            const year = tigerairDate.getUTCFullYear().toString().slice(-2);
-            const hours = tigerairDate.getUTCHours().toString().padStart(2, '0');
-            const minutes = tigerairDate.getUTCMinutes().toString().padStart(2, '0');
-            const tigerairUTC = `${day}/${month}/${year} ${hours}:${minutes}`;
-            
-            // 越南 UTC (日/月數字/年 時:分)
+            // 越南 UTC
             const vietnamDate = new Date(now.toUTCString());
             const vnDay = vietnamDate.getUTCDate().toString().padStart(2, '0');
             const vnMonth = (vietnamDate.getUTCMonth() + 1).toString().padStart(2, '0');
@@ -817,38 +852,17 @@
             
             document.getElementById('taiwan-time').textContent = taiwanTime;
             document.getElementById('taiwan-day').textContent = taiwanDay;
-            document.getElementById('tigerair-utc').textContent = tigerairUTC;
             document.getElementById('vietnam-utc').textContent = vietnamUTC;
             
-            // 日期格式化函數
             function formatDate(date) {
                 return date.toLocaleDateString('zh-TW', { year: 'numeric', month: '2-digit', day: '2-digit' });
             }
             
-            // 3天後
-            const plus3 = new Date(now);
-            plus3.setDate(now.getDate() + 3);
-            document.getElementById('plus3-b').textContent = formatDate(plus3);
-            
-            // 10天後
-            const plus10 = new Date(now);
-            plus10.setDate(now.getDate() + 10);
-            document.getElementById('plus10-c').textContent = formatDate(plus10);
-            
-            // 120天後
-            const plus120 = new Date(now);
-            plus120.setDate(now.getDate() + 120);
-            document.getElementById('plus120-d').textContent = formatDate(plus120);
-            
-            // 180天後
-            const plus180 = new Date(now);
-            plus180.setDate(now.getDate() + 180);
-            document.getElementById('plus180').textContent = formatDate(plus180);
-            
-            // 9個月後 (越南NEF)
-            const plus9months = new Date(now);
-            plus9months.setMonth(now.getMonth() + 9);
-            document.getElementById('plus9months').textContent = formatDate(plus9months);
+            const plus3 = new Date(now); plus3.setDate(now.getDate() + 3); document.getElementById('plus3-b').textContent = formatDate(plus3);
+            const plus10 = new Date(now); plus10.setDate(now.getDate() + 10); document.getElementById('plus10-c').textContent = formatDate(plus10);
+            const plus120 = new Date(now); plus120.setDate(now.getDate() + 120); document.getElementById('plus120-d').textContent = formatDate(plus120);
+            const plus180 = new Date(now); plus180.setDate(now.getDate() + 180); document.getElementById('plus180').textContent = formatDate(plus180);
+            const plus9months = new Date(now); plus9months.setMonth(now.getMonth() + 9); document.getElementById('plus9months').textContent = formatDate(plus9months);
         }
         
         const inputs = document.querySelectorAll('input');
@@ -862,7 +876,6 @@
         
         calculateAll();
         
-        // 檢查必要欄位是否已填寫（排除 CTR 的 j13 和 l13）
         function allMainInputsFilled() {
             const requiredIds = ['j11', 'l11', 'j15', 'l15', 'o10', 'o18'];
             for (let id of requiredIds) {
@@ -1063,7 +1076,6 @@
                 document.getElementById('suggestionSpan').classList.remove('suggestion-highlight');
             }
             
-            // 初始時間更新
             updateTime();
         });
         

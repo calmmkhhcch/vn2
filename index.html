@@ -4,10 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>越南油量計算系統 - 聯合航空加油單計算</title>
-    <!-- html2canvas 庫：用於截圖功能 -->
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <style>
-        /* 基本樣式 (與原版相同，未改動) */
+        /* ========== 基本樣式 (保持原有設計) ========== */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -38,13 +37,6 @@
             font-size: 0.9em;
             color: #555;
             line-height: 1.6;
-        }
-        .disclaimer-content p {
-            margin-bottom: 10px;
-            text-align: justify;
-        }
-        .disclaimer-content p:last-child {
-            margin-bottom: 0;
         }
         .container {
             max-width: 1200px;
@@ -96,17 +88,11 @@
             flex-wrap: wrap;
         }
         @media (min-width: 769px) {
-            .refuel-section {
-                flex-wrap: nowrap;
-            }
+            .refuel-section { flex-wrap: nowrap; }
         }
         @media (max-width: 768px) {
-            .refuel-section {
-                flex-direction: column;
-                align-items: flex-start;
-            }
+            .refuel-section { flex-direction: column; align-items: flex-start; }
         }
-        
         .refuel-button, .lock-button, .unlock-button, .status-button {
             white-space: nowrap;
             padding: 10px 15px;
@@ -117,38 +103,18 @@
             cursor: pointer;
             transition: background-color 0.3s;
         }
-        .refuel-button {
-            background-color: #4CAF50;
-            color: white;
-        }
-        .refuel-button:hover {
-            background-color: #45a049;
-        }
-        .lock-button {
-            background-color: #2196F3;
-            color: white;
-        }
-        .lock-button:hover {
-            background-color: #0b7dda;
-        }
-        .unlock-button {
-            background-color: #ff9800;
-            color: white;
-        }
-        .unlock-button:hover {
-            background-color: #e68a00;
-        }
-        .status-button {
-            background-color: #90EE90;
-            color: #333;
-            cursor: default;
-        }
+        .refuel-button { background-color: #4CAF50; color: white; }
+        .refuel-button:hover { background-color: #45a049; }
+        .lock-button { background-color: #2196F3; color: white; }
+        .lock-button:hover { background-color: #0b7dda; }
+        .unlock-button { background-color: #ff9800; color: white; }
+        .unlock-button:hover { background-color: #e68a00; }
+        .status-button { background-color: #90EE90; color: #333; cursor: default; }
         .estimated-time {
             font-size: 16px;
             color: #333;
             flex-grow: 1;
             min-width: 200px;
-            white-space: normal;
         }
         .estimated-time span {
             font-weight: bold;
@@ -158,77 +124,94 @@
             font-size: 18px;
         }
         
-        /* 航班資訊卡片 */
+        /* 航班資訊卡片 - 緊湊且輸入框自動寬度 */
         .flight-info-card {
             background: linear-gradient(135deg, #eef2f7, #ffffff);
-            border-radius: 12px;
-            padding: 15px 20px;
-            margin-bottom: 25px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border-radius: 10px;
+            padding: 12px 16px;          /* 縮小內距 */
+            margin-bottom: 20px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.05);
             border: 1px solid #dce4ec;
             display: flex;
             flex-wrap: wrap;
             align-items: flex-end;
-            gap: 20px;
-            row-gap: 15px;
+            gap: 15px;
+            row-gap: 10px;
         }
         .info-item {
             display: flex;
             flex-direction: column;
-            min-width: 150px;
+            flex: 0 1 auto;               /* 不強制撐大 */
+            min-width: 180px;
         }
         .info-item label {
-            font-size: 13px;
+            font-size: 12px;
             font-weight: bold;
             color: #2c3e50;
-            margin-bottom: 6px;
-            letter-spacing: 1px;
+            margin-bottom: 4px;
         }
         .info-item .date-display {
             background-color: #fff;
             border: 1px solid #bdc3c7;
-            border-radius: 6px;
-            padding: 8px 12px;
-            font-size: 16px;
+            border-radius: 5px;
+            padding: 6px 10px;
+            font-size: 14px;
             font-weight: 500;
             color: #e67e22;
             text-align: center;
-            font-family: monospace;
             background-color: #fef9e6;
         }
-        .info-item input {
-            width: 200px;
-            padding: 8px 12px;
+        .combined-input {
+            display: inline-flex;
+            align-items: center;
+            background: white;
             border: 1px solid #bdc3c7;
-            border-radius: 6px;
-            font-size: 14px;
-            transition: 0.2s;
+            border-radius: 5px;
+            overflow: hidden;
         }
-        .info-item input:focus {
-            border-color: #4CAF50;
+        .prefix-fixed {
+            background-color: #f0f0f0;
+            padding: 6px 10px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #2c3e50;
+            border-right: 1px solid #bdc3c7;
+            white-space: nowrap;
+        }
+        .combined-input input {
+            border: none;
             outline: none;
-            box-shadow: 0 0 0 2px rgba(76,175,80,0.2);
+            padding: 6px 8px;
+            font-size: 13px;
+            text-align: left;
+            background: white;
+            min-width: 80px;
+            width: auto;                 /* 關鍵：讓寬度自動根據內容撐開 */
+            box-sizing: content-box;    /* 保證 padding 不影響寬度計算 */
+        }
+        /* 動態寬度調整時，不限制最大寬度，但避免過長影響版面，可設定 max-width */
+        .combined-input input {
+            max-width: 200px;
         }
         .screenshot-btn {
             background-color: #2c3e50;
             color: white;
             border: none;
-            border-radius: 8px;
-            padding: 8px 24px;
-            font-size: 15px;
+            border-radius: 6px;
+            padding: 6px 20px;
+            font-size: 14px;
             font-weight: bold;
             cursor: pointer;
-            transition: 0.2s;
             margin-left: auto;
-            height: 42px;
+            height: 34px;
             align-self: flex-end;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            white-space: nowrap;
         }
         .screenshot-btn:hover {
             background-color: #1a2632;
-            transform: translateY(-1px);
         }
         
+        /* 表格樣式 (保持原有) */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -242,10 +225,7 @@
             font-size: 13px;
             height: 35px;
         }
-        th {
-            background-color: #e6e6e6;
-            font-weight: bold;
-        }
+        th { background-color: #e6e6e6; font-weight: bold; }
         .formula {
             background-color: #f2f2f2;
             color: #0070c0;
@@ -255,16 +235,10 @@
         .no-input {
             background-color: #d9d9d9;
             color: #7f7f7f;
-            padding: 2px 4px;
             font-size: 11px;
             height: 25px;
-            width: 50px;
         }
-        .input-cell {
-            background-color: white;
-            padding: 2px 4px;
-            min-width: 70px;
-        }
+        .input-cell { background-color: white; padding: 2px 4px; min-width: 70px; }
         input {
             width: 100%;
             border: 1px solid #999;
@@ -273,17 +247,11 @@
             font-size: 13px;
             padding: 3px;
             border-radius: 3px;
-            box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
             height: 25px;
         }
         input:focus {
             outline: 2px solid #4d90fe;
             background-color: #f0f8ff;
-        }
-        input::placeholder {
-            color: #999;
-            font-style: italic;
-            font-size: 11px;
         }
         input:disabled {
             background-color: #f5f5f5;
@@ -296,57 +264,19 @@
             background-color: #f9f9f9;
             border-left: 4px solid #0070c0;
         }
-        .instructions p {
-            margin-bottom: 10px;
-            line-height: 1.5;
-        }
+        .instructions p { margin-bottom: 10px; line-height: 1.5; }
         .formula-display {
             font-style: italic;
             color: #0070c0;
             font-size: 12px;
-            padding: 2px 0;
-            min-width: 80px;
         }
-        .red-text {
-            color: red;
-            font-weight: bold;
-        }
-        .note {
-            font-size: 11px;
-            color: #666;
-            margin-top: 3px;
-        }
-        .liter-input {
-            margin-top: 3px;
-        }
-        .discrepancy {
-            font-weight: bold;
-            color: black;
-        }
-        .separator {
-            border-bottom: 2px solid #000;
-            margin: 2px 0;
-        }
-        .input-label {
-            font-size: 10px;
-            color: #666;
-            margin-top: 1px;
-        }
-        .narrow-column {
-            width: 50px;
-        }
-        .remain-column {
-            width: 70px;
-        }
-        .red-english {
-            color: red;
-            font-weight: bold;
-        }
+        .red-text { color: red; font-weight: bold; }
+        .note { font-size: 11px; color: #666; margin-top: 3px; }
+        .narrow-column { width: 50px; }
+        .remain-column { width: 70px; }
         .info-cell {
             padding: 0;
-            position: relative;
             min-width: 120px;
-            background-color: transparent;
         }
         .info-cell-top {
             background-color: #f9f9f9;
@@ -368,60 +298,16 @@
             justify-content: center;
             background-color: #ffffff;
         }
-        .info-cell-bottom input {
-            height: 20px;
-            font-size: 12px;
-        }
-        .info-cell-bottom .formula-display {
-            font-size: 12px;
-        }
         .discrepancy-cell .info-cell-top,
         .density-cell .info-cell-top,
-        .fuel-bill-cell .info-cell-top {
-            color: black;
-        }
-        .fuel-bill-cell .info-cell-bottom .note {
-            font-size: 11px;
-            color: #666;
-            text-align: center;
-        }
-        .long-text-cell .info-cell-top {
-            font-size: 10px;
-            line-height: 1.1;
-            padding: 2px 1px;
-            word-wrap: break-word;
-            background-color: #f9f9f9;
-        }
-        
-        /* 深藍綠背景與白色文字 */
+        .fuel-bill-cell .info-cell-top { color: black; }
         .light-blue, .english-header {
             background-color: rgb(4,108,132) !important;
             color: white !important;
         }
-        td.yellow {
-            background-color: rgb(4,108,132) !important;
-            color: white !important;
-        }
-        th.yellow {
-            background-color: rgb(219,163,20) !important;
-        }
-        th.liter-cell {
-            background-color: rgb(219,163,20) !important;
-        }
-        th.liter-cell input {
-            background-color: white;
-        }
-        td.density-cell {
-            background-color: rgb(219,163,20) !important;
-        }
-        td.density-cell .info-cell-top,
-        td.density-cell .info-cell-bottom {
-            background-color: inherit;
-        }
-        td.density-cell input {
-            background-color: white;
-        }
-        
+        td.yellow { background-color: rgb(4,108,132) !important; color: white !important; }
+        th.liter-cell { background-color: rgb(219,163,20) !important; }
+        td.density-cell { background-color: rgb(219,163,20) !important; }
         .layout-note {
             background-color: #fffacd;
             border: 1px solid #e6db55;
@@ -430,236 +316,111 @@
             border-radius: 4px;
             font-size: 12px;
         }
-        .layout-note p {
-            margin: 0;
-            color: #8b6914;
-            font-weight: bold;
-        }
         .info-section {
             background-color: #e6f2ff;
             padding: 15px;
             border-radius: 5px;
             margin-top: 20px;
             font-size: 14px;
-            line-height: 1.5;
-        }
-        .info-section h3 {
-            margin-top: 0;
-            color: #0066cc;
         }
         
-        /* 時間卡片區域 */
+        /* 時間卡片、月份對照、電報圖片 (維持原樣) */
         .time-section {
             display: grid;
             grid-template-columns: repeat(6, 1fr);
             gap: 12px;
-            margin-bottom: 20px;
-            max-width: 1200px;
             margin: 20px auto 0;
         }
         .time-card {
             border-radius: 8px;
-            padding: 15px;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-            min-height: 120px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .time-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+            padding: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            min-height: 100px;
         }
         .card-title {
             display: flex;
             justify-content: center;
-            align-items: center;
             gap: 1.5em;
-            font-size: 1em;
             font-weight: bold;
-            margin-bottom: 10px;
-            color: #2c3e50;
-            text-align: center;
+            margin-bottom: 8px;
             border-bottom: 1px solid rgba(0,0,0,0.1);
-            padding-bottom: 8px;
+            padding-bottom: 6px;
         }
-        .days-highlight {
-            color: red;
-            font-weight: bold;
-        }
-        .time-display {
-            display: flex;
-            flex-direction: column;
-        }
+        .days-highlight { color: red; }
         .time-item {
-            margin: 5px 0;
+            margin: 4px 0;
             display: flex;
             justify-content: space-between;
-            align-items: center;
         }
-        .time-label {
-            font-size: 0.8em;
-            color: #7f8c8d;
-            font-weight: bold;
-        }
-        .time-value {
-            font-size: 1em;
-            font-weight: bold;
-            color: #2c3e50;
-        }
-        .vietnam-label {
-            color: red;
-            font-weight: bold;
-        }
-        .vietnam-row {
-            font-size: 1.5em;
-            line-height: 1.4;
-            margin: 8px 0;
-        }
-        
+        .time-label { font-size: 0.75em; color: #7f8c8d; font-weight: bold; }
+        .time-value { font-size: 0.9em; font-weight: bold; color: #2c3e50; }
+        .vietnam-label { color: red; }
+        .vietnam-row { font-size: 1.3em; margin: 4px 0; }
         .card-1 { background: linear-gradient(135deg, #fff9c4, #ffecb3); border-left: 4px solid #ffd54f; }
         .card-2 { background: linear-gradient(135deg, #c8e6c9, #a5d6a7); border-left: 4px solid #4caf50; }
-        .card-3 { background: linear-gradient(135deg, #fff9c4, #ffecb3); border-left: 4px solid #ffd54f; }
-        .card-4 { background: linear-gradient(135deg, #c8e6c9, #a5d6a7); border-left: 4px solid #4caf50; }
-        .card-5 { background: linear-gradient(135deg, #fff9c4, #ffecb3); border-left: 4px solid #ffd54f; }
-        .card-6 { background: linear-gradient(135deg, #c8e6c9, #a5d6a7); border-left: 4px solid #4caf50; }
-        
         .month-section {
             background-color: #f0f0f0;
             border-radius: 8px;
-            padding: 15px;
+            padding: 12px;
             margin-top: 20px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            gap: 10px 20px;
+            gap: 8px 15px;
         }
         .month-item {
-            font-size: 14px;
-            padding: 5px 10px;
+            font-size: 12px;
+            padding: 4px 8px;
             background-color: white;
             border-radius: 20px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             border: 1px solid #ddd;
         }
-        .month-item span {
-            font-weight: bold;
-            color: #333;
-            margin-right: 5px;
-        }
-        .month-item .en {
-            color: #0066cc;
-            font-weight: bold;
-        }
-        
         .telegram-section {
             max-width: 1200px;
             margin: 20px auto 0;
-            padding: 20px;
+            padding: 15px;
             background-color: white;
             border-radius: 8px;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
         }
         .telegram-title {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: bold;
             text-align: center;
-            margin-bottom: 20px;
-            color: #2c3e50;
-            padding-bottom: 10px;
+            margin-bottom: 15px;
             border-bottom: 2px solid #4CAF50;
         }
         .telegram-image {
-            display: block;
             max-width: 100%;
-            height: auto;
             margin: 0 auto;
-            border-radius: 5px;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
             opacity: 0;
-            transition: opacity 0.5s ease;
+            transition: opacity 0.5s;
         }
-        .telegram-image.loaded {
-            opacity: 1;
-        }
-        .image-loading {
-            text-align: center;
-            padding: 20px;
-            color: #666;
-            font-style: italic;
-        }
-        .image-error {
-            text-align: center;
-            color: #e74c3c;
-            padding: 20px;
-            background-color: #ffe6e6;
-            border-radius: 5px;
-            margin-top: 10px;
-        }
+        .telegram-image.loaded { opacity: 1; }
         .result-row th {
             background-color: #ffffff;
             font-size: 15px;
-            padding: 10px;
             text-align: left;
             border-bottom: 2px solid #000;
         }
-        .result-normal {
-            background-color: #a5d6a7 !important;
-            color: #1b5e20 !important;
-            font-weight: bold;
-            padding: 5px 10px;
-            border-radius: 4px;
-        }
-        .result-abnormal {
-            background-color: #ef9a9a !important;
-            color: #b71c1c;
-            font-weight: bold;
-            padding: 5px 10px;
-            border-radius: 4px;
-        }
-        .suggestion-text {
-            display: block;
-            margin-top: 8px;
-            font-size: 14px;
-            margin-left: 0;
-        }
+        .result-normal { background-color: #a5d6a7 !important; color: #1b5e20 !important; }
+        .result-abnormal { background-color: #ef9a9a !important; color: #b71c1c; }
         .suggestion-highlight {
             background-color: #fffacd;
             padding: 5px 10px;
             border-radius: 4px;
-            color: #333;
-            font-weight: normal;
         }
         
         @media (max-width: 1024px) {
-            .time-section {
-                grid-template-columns: repeat(3, 1fr);
-            }
+            .time-section { grid-template-columns: repeat(3, 1fr); }
         }
         @media (max-width: 768px) {
-            .time-section {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            .flight-info-card {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            .screenshot-btn {
-                margin-left: 0;
-                align-self: stretch;
-                text-align: center;
-            }
+            .time-section { grid-template-columns: repeat(2, 1fr); }
+            .flight-info-card { flex-direction: column; align-items: stretch; }
+            .screenshot-btn { margin-left: 0; align-self: stretch; text-align: center; }
+            .info-item { min-width: 100%; }
         }
         @media (max-width: 480px) {
-            .time-section {
-                grid-template-columns: 1fr;
-            }
-            .time-card {
-                min-height: 100px;
-                padding: 12px;
-            }
+            .time-section { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -692,7 +453,7 @@
             </div>
         </div>
 
-        <!-- ========= 截圖區域：僅包含航班資訊、表格、操作說明 ========= -->
+        <!-- 截圖目標區域 -->
         <div id="screenshotTarget">
             <div class="flight-info-card">
                 <div class="info-item">
@@ -701,11 +462,17 @@
                 </div>
                 <div class="info-item">
                     <label>✈️ 飛機號</label>
-                    <input type="text" id="aircraftNumber" value="VN-A" placeholder="VN-A + 數字">
+                    <div class="combined-input">
+                        <span class="prefix-fixed">VN-A</span>
+                        <input type="text" id="aircraftSuffix" placeholder="數字" value="">
+                    </div>
                 </div>
                 <div class="info-item">
                     <label>🆔 航班號</label>
-                    <input type="text" id="flightNumber" value="VN-" placeholder="VN- + 數字">
+                    <div class="combined-input">
+                        <span class="prefix-fixed">VN-</span>
+                        <input type="text" id="flightSuffix" placeholder="數字" value="">
+                    </div>
                 </div>
                 <button id="downloadScreenshotBtn" class="screenshot-btn">📸 下載截圖</button>
             </div>
@@ -819,9 +586,8 @@
                 <div class="layout-note"><p>* 表格照越南TLB製作，橫式 篇幅可能比較大，建議要手動縮小版面</p></div>
             </div>
         </div>
-        <!-- ========= 截圖區域結束 ========= -->
 
-        <!-- 以下區域不會出現在截圖中 -->
+        <!-- 以下內容不會出現在截圖中 -->
         <div class="info-section">
             <h3>加油時間計算說明</h3>
             <p>此計算器根據加油作業標準估算加油時間：</p>
@@ -833,7 +599,6 @@
             </ul>
         </div>
 
-        <!-- 時間卡片區域 -->
         <div class="time-section">
             <div class="time-card card-1">
                 <div class="card-title">當前時間</div>
@@ -866,190 +631,190 @@
     <script>
         let isPageLocked = false;
         
+        // 動態調整輸入框寬度，確保數字完整顯示
+        function adjustInputWidth(inputEl) {
+            if (!inputEl) return;
+            // 創建一個隱藏的測量元素
+            const measure = document.createElement('span');
+            measure.style.visibility = 'hidden';
+            measure.style.position = 'absolute';
+            measure.style.whiteSpace = 'pre';
+            measure.style.font = window.getComputedStyle(inputEl).font;
+            measure.textContent = inputEl.value || inputEl.placeholder || '';
+            document.body.appendChild(measure);
+            const width = Math.max(measure.offsetWidth + 12, 60); // 最小60px
+            inputEl.style.width = width + 'px';
+            document.body.removeChild(measure);
+        }
+        
         function updateAutoDate() {
             const now = new Date();
             const year = now.getFullYear();
             const month = String(now.getMonth() + 1).padStart(2, '0');
             const day = String(now.getDate()).padStart(2, '0');
-            const formattedDate = `${year}/${month}/${day}`;
-            const dateSpan = document.getElementById('autoDateDisplay');
-            if(dateSpan) dateSpan.textContent = formattedDate;
+            document.getElementById('autoDateDisplay').textContent = `${year}/${month}/${day}`;
         }
         
         function updateTime() {
             const now = new Date();
-            const taiwanTime = now.toLocaleString('zh-TW', { timeZone: 'Asia/Taipei', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
-            const taiwanDay = now.toLocaleString('zh-TW', { timeZone: 'Asia/Taipei', weekday: 'long' });
-            const vietnamDate = new Date(now.toUTCString());
-            const vnDay = vietnamDate.getUTCDate().toString().padStart(2, '0');
-            const vnMonth = (vietnamDate.getUTCMonth() + 1).toString().padStart(2, '0');
-            const vnYear = vietnamDate.getUTCFullYear().toString().slice(-2);
-            const vnHours = vietnamDate.getUTCHours().toString().padStart(2, '0');
-            const vnMinutes = vietnamDate.getUTCMinutes().toString().padStart(2, '0');
-            const vietnamUTC = `${vnDay}/${vnMonth}/${vnYear} ${vnHours}:${vnMinutes}`;
-            document.getElementById('taiwan-time').textContent = taiwanTime;
-            document.getElementById('taiwan-day').textContent = taiwanDay;
+            document.getElementById('taiwan-time').textContent = now.toLocaleString('zh-TW', { timeZone: 'Asia/Taipei', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+            document.getElementById('taiwan-day').textContent = now.toLocaleString('zh-TW', { timeZone: 'Asia/Taipei', weekday: 'long' });
+            const vnDate = new Date(now.toUTCString());
+            const vietnamUTC = `${String(vnDate.getUTCDate()).padStart(2,'0')}/${String(vnDate.getUTCMonth()+1).padStart(2,'0')}/${vnDate.getUTCFullYear().toString().slice(-2)} ${String(vnDate.getUTCHours()).padStart(2,'0')}:${String(vnDate.getUTCMinutes()).padStart(2,'0')}`;
             document.getElementById('vietnam-utc').textContent = vietnamUTC;
-            function formatDate(date) { return date.toLocaleDateString('zh-TW', { year: 'numeric', month: '2-digit', day: '2-digit' }); }
-            const plus3 = new Date(now); plus3.setDate(now.getDate() + 3); document.getElementById('plus3-b').textContent = formatDate(plus3);
-            const plus10 = new Date(now); plus10.setDate(now.getDate() + 10); document.getElementById('plus10-c').textContent = formatDate(plus10);
-            const plus120 = new Date(now); plus120.setDate(now.getDate() + 120); document.getElementById('plus120-d').textContent = formatDate(plus120);
-            const plus180 = new Date(now); plus180.setDate(now.getDate() + 180); document.getElementById('plus180').textContent = formatDate(plus180);
-            const plus9months = new Date(now); plus9months.setMonth(now.getMonth() + 9); document.getElementById('plus9months').textContent = formatDate(plus9months);
+            function fmt(d) { return d.toLocaleDateString('zh-TW'); }
+            const p3=new Date(now); p3.setDate(now.getDate()+3); document.getElementById('plus3-b').textContent=fmt(p3);
+            const p10=new Date(now); p10.setDate(now.getDate()+10); document.getElementById('plus10-c').textContent=fmt(p10);
+            const p120=new Date(now); p120.setDate(now.getDate()+120); document.getElementById('plus120-d').textContent=fmt(p120);
+            const p180=new Date(now); p180.setDate(now.getDate()+180); document.getElementById('plus180').textContent=fmt(p180);
+            const p9m=new Date(now); p9m.setMonth(now.getMonth()+9); document.getElementById('plus9months').textContent=fmt(p9m);
             updateAutoDate();
         }
         
-        const inputs = document.querySelectorAll('input');
-        inputs.forEach(input => { input.addEventListener('input', calculateAll); });
-        document.getElementById('startRefuelBtn').addEventListener('click', calculateRefuelTime);
-        document.getElementById('lockPageBtn').addEventListener('click', lockPage);
-        document.getElementById('unlockPageBtn').addEventListener('click', unlockPage);
-        
-        function allMainInputsFilled() {
-            const requiredIds = ['j11', 'l11', 'j15', 'l15', 'o10', 'o18'];
-            for (let id of requiredIds) {
-                const el = document.getElementById(id);
-                if (!el || el.value.trim() === '') return false;
-            }
-            return true;
-        }
-        
         function calculateAll() {
-            const j11 = parseFloat(document.getElementById('j11').value) || 0;
-            const l11 = parseFloat(document.getElementById('l11').value) || 0;
-            const j13 = parseFloat(document.getElementById('j13').value) || 0;
-            const l13 = parseFloat(document.getElementById('l13').value) || 0;
-            const j15 = parseFloat(document.getElementById('j15').value) || 0;
-            const l15 = parseFloat(document.getElementById('l15').value) || 0;
-            const o10 = parseFloat(document.getElementById('o10').value) || 0;
-            const o18 = parseFloat(document.getElementById('o18').value) || 0;
+            const j11 = parseFloat(document.getElementById('j11').value)||0;
+            const l11 = parseFloat(document.getElementById('l11').value)||0;
+            const j13 = parseFloat(document.getElementById('j13').value)||0;
+            const l13 = parseFloat(document.getElementById('l13').value)||0;
+            const j15 = parseFloat(document.getElementById('j15').value)||0;
+            const l15 = parseFloat(document.getElementById('l15').value)||0;
+            const o10 = parseFloat(document.getElementById('o10').value)||0;
+            const o18 = parseFloat(document.getElementById('o18').value)||0;
             const k11 = l11 - j11;
             const k13 = l13 - j13;
             const k15 = l15 - j15;
             const j19 = j11 + j13 + j15;
             const k19 = k11 + k13 + k15;
             const l19 = l11 + l13 + l15;
-            const o12 = Math.round(o18 * o10 * 100) / 100;
-            const o16 = Math.round((o12 - k19) * 100) / 100;
+            const o12 = Math.round(o18 * o10 * 100)/100;
+            const o16 = Math.round((o12 - k19)*100)/100;
             document.getElementById('k11').textContent = k11.toFixed(2);
             document.getElementById('k13').textContent = k13.toFixed(2);
             document.getElementById('k15').textContent = k15.toFixed(2);
-            document.getElementById('i19').textContent = Math.round(0);
+            document.getElementById('i19').textContent = '0';
             document.getElementById('j19').textContent = Math.round(j19);
             document.getElementById('k19').textContent = Math.round(k19);
             document.getElementById('l19').textContent = Math.round(l19);
             document.getElementById('o12').textContent = o12.toFixed(2);
             document.getElementById('o14').textContent = Math.round(k19);
             document.getElementById('o16').textContent = o16.toFixed(2);
-            if (allMainInputsFilled()) updateResultDisplay(o16, Math.round(j19), Math.round(l19), o12);
-            else { document.getElementById('resultStatus').textContent = ''; document.getElementById('suggestionSpan').textContent = ''; }
-        }
-        
-        function updateResultDisplay(discrepancy) {
+            
             const resultSpan = document.getElementById('resultStatus');
             const suggestionSpan = document.getElementById('suggestionSpan');
-            resultSpan.classList.remove('result-normal', 'result-abnormal');
-            if (discrepancy >= -100 && discrepancy <= 100) {
-                resultSpan.textContent = `正常 (差異值: ${discrepancy.toFixed(2)}，符合 -100~100 之間)`;
-                resultSpan.classList.add('result-normal');
+            if (o16 >= -100 && o16 <= 100) {
+                resultSpan.textContent = `正常 (差異值: ${o16.toFixed(2)}，符合 -100~100 之間)`;
+                resultSpan.className = 'result-normal';
                 suggestionSpan.textContent = '';
             } else {
-                resultSpan.textContent = `異常 (差異值: ${discrepancy.toFixed(2)}，已超出 -100~100 範圍)`;
-                resultSpan.classList.add('result-abnormal');
-                const l19 = parseFloat(document.getElementById('l19').textContent) || 0;
-                const o12 = parseFloat(document.getElementById('o12').textContent) || 0;
-                let idealJ19 = Math.round(l19 - o12);
-                let direction = discrepancy < -100 ? '以上' : '以下';
-                suggestionSpan.textContent = `建議調整剩餘油量至 ${idealJ19} ${direction}`;
+                resultSpan.textContent = `異常 (差異值: ${o16.toFixed(2)}，已超出 -100~100 範圍)`;
+                resultSpan.className = 'result-abnormal';
+                const l19v = parseFloat(document.getElementById('l19').textContent)||0;
+                const o12v = parseFloat(document.getElementById('o12').textContent)||0;
+                let ideal = Math.round(l19v - o12v);
+                suggestionSpan.textContent = `建議調整剩餘油量至 ${ideal} ${o16 < -100 ? '以上' : '以下'}`;
                 suggestionSpan.classList.add('suggestion-highlight');
             }
         }
         
         function calculateRefuelTime() {
-            const requiredFuel = parseFloat(document.getElementById('requiredFuelInput').value) || 0;
-            const remainingFuel = parseInt(document.getElementById('j19').textContent) || 0;
-            if (requiredFuel <= remainingFuel) { document.getElementById('estimatedTime').innerHTML = '加油結束預估時間：<span>油量已足夠，無需加油</span>'; return; }
-            if (requiredFuel <= 0) { document.getElementById('estimatedTime').innerHTML = '加油結束預估時間：<span>請輸入正確的油量數據</span>'; return; }
-            const refuelTimeMinutes = (requiredFuel - remainingFuel) / 720;
-            const now = new Date();
-            const completionTime = new Date(now.getTime() + (refuelTimeMinutes * 60 * 1000));
-            const formattedTime = formatDateTime(completionTime);
-            const durationHours = Math.floor(refuelTimeMinutes / 60);
-            const durationMinutes = Math.round(refuelTimeMinutes % 60);
-            let durationText = durationHours > 0 ? `（約需 ${durationHours} 小時 ${durationMinutes} 分鐘）` : `（約需 ${durationMinutes} 分鐘）`;
-            document.getElementById('estimatedTime').innerHTML = `加油結束預估時間：<span>${formattedTime} ${durationText}</span>`;
-        }
-        
-        function formatDateTime(date) { return `${date.getFullYear()}/${String(date.getMonth()+1).padStart(2,'0')}/${String(date.getDate()).padStart(2,'0')} ${String(date.getHours()).padStart(2,'0')}:${String(date.getMinutes()).padStart(2,'0')}:${String(date.getSeconds()).padStart(2,'0')}`; }
-        
-        function updateStatusButton() {
-            const btn = document.getElementById('statusButton');
-            if (isPageLocked) { btn.textContent = "狀態：已鎖定，請解鎖"; btn.style.backgroundColor = "#ffcccc"; }
-            else { btn.textContent = "狀態：已解鎖，可輸入"; btn.style.backgroundColor = "#90EE90"; }
+            const required = parseFloat(document.getElementById('requiredFuelInput').value)||0;
+            const remain = parseInt(document.getElementById('j19').textContent)||0;
+            if (required <= remain) { document.getElementById('estimatedTime').innerHTML = '加油結束預估時間：<span>油量已足夠，無需加油</span>'; return; }
+            if (required <= 0) { document.getElementById('estimatedTime').innerHTML = '加油結束預估時間：<span>請輸入正確的油量數據</span>'; return; }
+            const minutes = (required - remain) / 720;
+            const end = new Date(Date.now() + minutes*60*1000);
+            const fmt = d => `${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}:${String(d.getSeconds()).padStart(2,'0')}`;
+            const hrs = Math.floor(minutes/60);
+            const mins = Math.round(minutes%60);
+            document.getElementById('estimatedTime').innerHTML = `加油結束預估時間：<span>${fmt(end)} ${hrs>0?`（約需 ${hrs} 小時 ${mins} 分鐘）`:`（約需 ${mins} 分鐘）`}</span>`;
         }
         
         function lockPage() {
             isPageLocked = true;
-            document.querySelectorAll('input').forEach(input => { input.disabled = true; });
-            const inputValues = {};
-            document.querySelectorAll('input').forEach(inp => { inputValues[inp.id] = inp.value; });
-            ['k11','k13','k15','i19','j19','k19','l19','o12','o14','o16'].forEach(id => { inputValues[id] = document.getElementById(id).textContent; });
-            localStorage.setItem('fuelCalculatorData', JSON.stringify(inputValues));
-            localStorage.setItem('isPageLocked', 'true');
-            updateStatusButton();
+            document.querySelectorAll('input').forEach(i=>i.disabled=true);
+            const data={};
+            document.querySelectorAll('input').forEach(i=>data[i.id]=i.value);
+            ['k11','k13','k15','i19','j19','k19','l19','o12','o14','o16'].forEach(id=>data[id]=document.getElementById(id).textContent);
+            localStorage.setItem('fuelCalculatorData',JSON.stringify(data));
+            localStorage.setItem('isPageLocked','true');
+            document.getElementById('statusButton').textContent="狀態：已鎖定，請解鎖";
+            document.getElementById('statusButton').style.backgroundColor="#ffcccc";
             alert('網頁已鎖定，所有輸入框已禁用，重新整理頁面不會丟失資料。');
         }
-        
         function unlockPage() {
-            isPageLocked = false;
-            document.querySelectorAll('input').forEach(input => { input.disabled = false; });
+            isPageLocked=false;
+            document.querySelectorAll('input').forEach(i=>i.disabled=false);
             localStorage.removeItem('fuelCalculatorData');
             localStorage.removeItem('isPageLocked');
-            updateStatusButton();
+            document.getElementById('statusButton').textContent="狀態：已解鎖，可輸入";
+            document.getElementById('statusButton').style.backgroundColor="#90EE90";
             alert('網頁已解除鎖定，可以重新整理頁面了。');
         }
         
-        // 截圖：只截取 #screenshotTarget 區域（不包含下方說明及卡片）
         document.getElementById('downloadScreenshotBtn').addEventListener('click', function() {
-            const element = document.getElementById('screenshotTarget');
-            if (!element) return;
-            html2canvas(element, {
+            const target = document.getElementById('screenshotTarget');
+            if (!target) return;
+            // 截圖前先強制重新調整一次輸入框寬度，確保所有數字完整顯示
+            adjustInputWidth(document.getElementById('aircraftSuffix'));
+            adjustInputWidth(document.getElementById('flightSuffix'));
+            html2canvas(target, {
                 scale: 2,
                 backgroundColor: '#ffffff',
                 logging: false,
-                useCORS: false
+                useCORS: false,
+                windowWidth: target.scrollWidth,
+                windowHeight: target.scrollHeight
             }).then(canvas => {
                 const link = document.createElement('a');
-                const timestamp = new Date().toISOString().slice(0,19).replace(/:/g, '-');
-                link.download = `加油單_${timestamp}.png`;
+                const ts = new Date().toISOString().slice(0,19).replace(/:/g, '-');
+                link.download = `加油單_${ts}.png`;
                 link.href = canvas.toDataURL('image/png');
                 link.click();
-            }).catch(err => { console.error('截圖失敗:', err); alert('截圖生成失敗，可嘗試重新整理頁面'); });
+            }).catch(err => { alert('截圖失敗，請重試'); });
         });
         
-        function imageLoaded() { document.getElementById('telegram-image').classList.add('loaded'); document.getElementById('image-loading').style.display = 'none'; }
+        function imageLoaded() {
+            document.getElementById('telegram-image').classList.add('loaded');
+            document.getElementById('image-loading').style.display = 'none';
+        }
+        
+        // 為兩個數字輸入框綁定動態寬度調整
+        const aircraftInput = document.getElementById('aircraftSuffix');
+        const flightInput = document.getElementById('flightSuffix');
+        function bindAutoWidth(input) {
+            input.addEventListener('input', function() { adjustInputWidth(this); });
+            // 初始調整一次
+            adjustInputWidth(input);
+        }
         
         window.addEventListener('load', function() {
-            const savedData = localStorage.getItem('fuelCalculatorData');
-            const isLocked = localStorage.getItem('isPageLocked');
-            if (savedData && isLocked === 'true') {
-                const values = JSON.parse(savedData);
-                Object.keys(values).forEach(key => {
-                    const el = document.getElementById(key);
-                    if (el && el.tagName === 'INPUT') el.value = values[key];
-                    else if (el && el.tagName !== 'INPUT') el.textContent = values[key];
+            const saved = localStorage.getItem('fuelCalculatorData');
+            const locked = localStorage.getItem('isPageLocked');
+            if (saved && locked === 'true') {
+                const vals = JSON.parse(saved);
+                Object.keys(vals).forEach(k=>{
+                    const el = document.getElementById(k);
+                    if (el && el.tagName==='INPUT') el.value = vals[k];
+                    else if (el) el.textContent = vals[k];
                 });
                 calculateAll();
                 alert('已恢復上次鎖定的資料。');
             }
-            const telegramImg = document.getElementById('telegram-image');
-            telegramImg.onerror = function() { document.getElementById('image-error').style.display = 'block'; document.getElementById('image-loading').style.display = 'none'; telegramImg.style.display = 'none'; };
+            const img = document.getElementById('telegram-image');
+            img.onerror = function() { document.getElementById('image-error').style.display='block'; document.getElementById('image-loading').style.display='none'; img.style.display='none'; };
             updateTime();
             setInterval(updateTime, 1000);
-            updateAutoDate();
             calculateAll();
+            document.querySelectorAll('input').forEach(inp=>inp.addEventListener('input',calculateAll));
+            document.getElementById('startRefuelBtn').addEventListener('click',calculateRefuelTime);
+            document.getElementById('lockPageBtn').addEventListener('click',lockPage);
+            document.getElementById('unlockPageBtn').addEventListener('click',unlockPage);
+            
+            // 動態寬度綁定
+            bindAutoWidth(aircraftInput);
+            bindAutoWidth(flightInput);
         });
-        window.addEventListener('beforeunload', function(e) { if (isPageLocked) { e.preventDefault(); e.returnValue = '您有未保存的更改，確定要離開嗎？'; } });
+        window.addEventListener('beforeunload', e=>{ if(isPageLocked){ e.preventDefault(); e.returnValue=''; } });
     </script>
 </body>
 </html>

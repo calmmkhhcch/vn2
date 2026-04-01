@@ -7,7 +7,7 @@
     <!-- html2canvas 庫：用於截圖功能 -->
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <style>
-        /* 基本樣式 */
+        /* 基本樣式 (與原版相同，未改動) */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -83,7 +83,7 @@
             border: 1px solid #999;
         }
         
-        /* 按鈕區域：大螢幕平行，小螢幕垂直 */
+        /* 按鈕區域 */
         .refuel-section {
             display: flex;
             align-items: center;
@@ -158,7 +158,7 @@
             font-size: 18px;
         }
         
-        /* 新增：航班資訊卡片區域 (位於按鈕列與表格之間) */
+        /* 航班資訊卡片 */
         .flight-info-card {
             background: linear-gradient(135deg, #eef2f7, #ffffff);
             border-radius: 12px;
@@ -448,7 +448,7 @@
             color: #0066cc;
         }
         
-        /* 時間卡片區域：6欄，小螢幕自動換行 */
+        /* 時間卡片區域 */
         .time-section {
             display: grid;
             grid-template-columns: repeat(6, 1fr);
@@ -692,7 +692,7 @@
             </div>
         </div>
 
-        <!-- ========= 新增區塊：日期、飛機、航班號 + 下載截圖按鈕 ========= -->
+        <!-- ========= 截圖區域：僅包含航班資訊、表格、操作說明 ========= -->
         <div id="screenshotTarget">
             <div class="flight-info-card">
                 <div class="info-item">
@@ -710,7 +710,7 @@
                 <button id="downloadScreenshotBtn" class="screenshot-btn">📸 下載截圖</button>
             </div>
 
-            <!-- 原始表格區塊 -->
+            <!-- 表格區塊 -->
             <table>
                 <thead>
                     <tr class="result-row">
@@ -809,6 +809,7 @@
                 </tbody>
             </table>
 
+            <!-- 操作說明 -->
             <div class="instructions">
                 <p><strong>操作說明：</strong></p>
                 <p>1. 運務會先給初步油量,如果沒有先設定9300kg先加油,等教官來會給FINAL油量( <span class="red-text">REQUIRED FUEL</span> )</p>
@@ -817,40 +818,42 @@
                 <p><strong>注意：</strong>油車的資料要輸入，不然無法運算</p>
                 <div class="layout-note"><p>* 表格照越南TLB製作，橫式 篇幅可能比較大，建議要手動縮小版面</p></div>
             </div>
-            
-            <div class="info-section">
-                <h3>加油時間計算說明</h3>
-                <p>此計算器根據加油作業標準估算加油時間：</p>
-                <ul>
-                    <li>計算公式：(REQUIRED FUEL - 剩餘油量總和) / 720 分鐘</li>
-                    <li>加油速率：720磅/分鐘</li>
-                    <li>計算結果為預估時間，實際加油時間可能因設備狀況、油料流速等因素有所不同</li>
-                    <li>計算結果基於當前台灣時間</li>
-                </ul>
-            </div>
-            
-            <!-- 時間卡片區域 -->
-            <div class="time-section">
-                <div class="time-card card-1">
-                    <div class="card-title">當前時間</div>
-                    <div class="time-display">
-                        <div class="time-item"><span class="time-label">台灣時間</span><span class="time-value" id="taiwan-time">--:--:--</span></div>
-                        <div class="time-item"><span class="time-label">星期</span><span class="time-value" id="taiwan-day">--</span></div>
-                        <div class="time-item vietnam-row"><span class="time-label vietnam-label">越南 UTC</span><span class="time-value" id="vietnam-utc">--</span></div>
-                    </div>
+        </div>
+        <!-- ========= 截圖區域結束 ========= -->
+
+        <!-- 以下區域不會出現在截圖中 -->
+        <div class="info-section">
+            <h3>加油時間計算說明</h3>
+            <p>此計算器根據加油作業標準估算加油時間：</p>
+            <ul>
+                <li>計算公式：(REQUIRED FUEL - 剩餘油量總和) / 720 分鐘</li>
+                <li>加油速率：720磅/分鐘</li>
+                <li>計算結果為預估時間，實際加油時間可能因設備狀況、油料流速等因素有所不同</li>
+                <li>計算結果基於當前台灣時間</li>
+            </ul>
+        </div>
+
+        <!-- 時間卡片區域 -->
+        <div class="time-section">
+            <div class="time-card card-1">
+                <div class="card-title">當前時間</div>
+                <div class="time-display">
+                    <div class="time-item"><span class="time-label">台灣時間</span><span class="time-value" id="taiwan-time">--:--:--</span></div>
+                    <div class="time-item"><span class="time-label">星期</span><span class="time-value" id="taiwan-day">--</span></div>
+                    <div class="time-item vietnam-row"><span class="time-label vietnam-label">越南 UTC</span><span class="time-value" id="vietnam-utc">--</span></div>
                 </div>
-                <div class="time-card card-2"><div class="card-title"><span>CAT B</span><span class="days-highlight">3天後</span></div><div class="time-display"><div class="time-item"><span class="time-label">日期</span><span class="time-value" id="plus3-b">--</span></div></div></div>
-                <div class="time-card card-3"><div class="card-title"><span>CAT C</span><span class="days-highlight">10天後</span></div><div class="time-display"><div class="time-item"><span class="time-label">日期</span><span class="time-value" id="plus10-c">--</span></div></div></div>
-                <div class="time-card card-4"><div class="card-title"><span>CAT D</span><span class="days-highlight">120天後</span></div><div class="time-display"><div class="time-item"><span class="time-label">日期</span><span class="time-value" id="plus120-d">--</span></div></div></div>
-                <div class="time-card card-5"><div class="card-title">180天後</div><div class="time-display"><div class="time-item"><span class="time-label">日期</span><span class="time-value" id="plus180">--</span></div></div></div>
-                <div class="time-card card-6"><div class="card-title"><span>越南NEF</span><span class="days-highlight">9個月後</span></div><div class="time-display"><div class="time-item"><span class="time-label">日期</span><span class="time-value" id="plus9months">--</span></div></div></div>
             </div>
-            
-            <div class="month-section">
-                <div class="month-item"><span>1月</span><span class="en">JAN</span></div><div class="month-item"><span>2月</span><span class="en">FEB</span></div><div class="month-item"><span>3月</span><span class="en">MAR</span></div><div class="month-item"><span>4月</span><span class="en">APR</span></div><div class="month-item"><span>5月</span><span class="en">MAY</span></div><div class="month-item"><span>6月</span><span class="en">JUN</span></div>
-                <div class="month-item"><span>7月</span><span class="en">JUL</span></div><div class="month-item"><span>8月</span><span class="en">AUG</span></div><div class="month-item"><span>9月</span><span class="en">SEP</span></div><div class="month-item"><span>10月</span><span class="en">OCT</span></div><div class="month-item"><span>11月</span><span class="en">NOV</span></div><div class="month-item"><span>12月</span><span class="en">DEC</span></div>
-            </div>
-        </div>   <!-- 結束 screenshotTarget -->
+            <div class="time-card card-2"><div class="card-title"><span>CAT B</span><span class="days-highlight">3天後</span></div><div class="time-display"><div class="time-item"><span class="time-label">日期</span><span class="time-value" id="plus3-b">--</span></div></div></div>
+            <div class="time-card card-3"><div class="card-title"><span>CAT C</span><span class="days-highlight">10天後</span></div><div class="time-display"><div class="time-item"><span class="time-label">日期</span><span class="time-value" id="plus10-c">--</span></div></div></div>
+            <div class="time-card card-4"><div class="card-title"><span>CAT D</span><span class="days-highlight">120天後</span></div><div class="time-display"><div class="time-item"><span class="time-label">日期</span><span class="time-value" id="plus120-d">--</span></div></div></div>
+            <div class="time-card card-5"><div class="card-title">180天後</div><div class="time-display"><div class="time-item"><span class="time-label">日期</span><span class="time-value" id="plus180">--</span></div></div></div>
+            <div class="time-card card-6"><div class="card-title"><span>越南NEF</span><span class="days-highlight">9個月後</span></div><div class="time-display"><div class="time-item"><span class="time-label">日期</span><span class="time-value" id="plus9months">--</span></div></div></div>
+        </div>
+
+        <div class="month-section">
+            <div class="month-item"><span>1月</span><span class="en">JAN</span></div><div class="month-item"><span>2月</span><span class="en">FEB</span></div><div class="month-item"><span>3月</span><span class="en">MAR</span></div><div class="month-item"><span>4月</span><span class="en">APR</span></div><div class="month-item"><span>5月</span><span class="en">MAY</span></div><div class="month-item"><span>6月</span><span class="en">JUN</span></div>
+            <div class="month-item"><span>7月</span><span class="en">JUL</span></div><div class="month-item"><span>8月</span><span class="en">AUG</span></div><div class="month-item"><span>9月</span><span class="en">SEP</span></div><div class="month-item"><span>10月</span><span class="en">OCT</span></div><div class="month-item"><span>11月</span><span class="en">NOV</span></div><div class="month-item"><span>12月</span><span class="en">DEC</span></div>
+        </div>
 
         <div class="telegram-section">
             <div class="telegram-title">送機後回辦公室打越南電報</div>
@@ -863,7 +866,6 @@
     <script>
         let isPageLocked = false;
         
-        // 更新日期顯示 (自動抓取當前時間，格式 yyyy/mm/dd)
         function updateAutoDate() {
             const now = new Date();
             const year = now.getFullYear();
@@ -894,7 +896,7 @@
             const plus120 = new Date(now); plus120.setDate(now.getDate() + 120); document.getElementById('plus120-d').textContent = formatDate(plus120);
             const plus180 = new Date(now); plus180.setDate(now.getDate() + 180); document.getElementById('plus180').textContent = formatDate(plus180);
             const plus9months = new Date(now); plus9months.setMonth(now.getMonth() + 9); document.getElementById('plus9months').textContent = formatDate(plus9months);
-            updateAutoDate(); // 同步更新日期卡
+            updateAutoDate();
         }
         
         const inputs = document.querySelectorAll('input');
@@ -1007,7 +1009,7 @@
             alert('網頁已解除鎖定，可以重新整理頁面了。');
         }
         
-        // 下載截圖功能 (只截取 #screenshotTarget 區域)
+        // 截圖：只截取 #screenshotTarget 區域（不包含下方說明及卡片）
         document.getElementById('downloadScreenshotBtn').addEventListener('click', function() {
             const element = document.getElementById('screenshotTarget');
             if (!element) return;
